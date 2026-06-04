@@ -1,0 +1,6 @@
+@TrailBlaze.API_HostAddress = http://localhost:5133
+
+GET {{TrailBlaze.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
