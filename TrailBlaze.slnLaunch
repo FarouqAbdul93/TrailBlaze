@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "TrailBlaze.API\\TrailBlaze.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TrailBlaze.UI\\TrailBlaze.UI\\TrailBlaze.UI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
