@@ -1,0 +1,26 @@
+﻿<div class="trail-card">
+    <h3>@Trail.Name</h3>
+    <p>📍 @Trail.Location</p>
+    <p>📏 @Trail.DistanceMiles miles</p>
+    <p>💪 @Trail.Difficulty</p>
+    @if (Trail.AverageRating > 0)
+    {
+        <p>⭐ @Trail.AverageRating / 5</p>
+    }
+    <a href="/trails/@Trail.TrailId" class="btn-view">View Trail</a>
+</div>
+
+@code {
+    [Parameter]
+    public TrailCardModel Trail { get; set; } = new();
+
+    public class TrailCardModel
+    {
+        public int TrailId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public double DistanceMiles { get; set; }
+        public string Difficulty { get; set; } = string.Empty;
+        public double AverageRating { get; set; }
+    }
+}
