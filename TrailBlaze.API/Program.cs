@@ -9,6 +9,7 @@ builder.Services.AddDbContext<TrailBlazeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<ITrailRepository, TrailRepository>();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
