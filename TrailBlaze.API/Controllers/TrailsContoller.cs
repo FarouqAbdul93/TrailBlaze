@@ -36,5 +36,68 @@ namespace TrailBlaze.API.Controllers
 
             return Ok(trailDtos);
         }
+       
+        // GET: api/trails/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TrailDto>> GetTrailById(int id)
+        {
+            var trail = await _trailRepository.GetTrailByIdAsync(id);
+
+            if (trail == null)
+            {
+                return NotFound();
+            }
+
+            var trailDto = new TrailDto
+            {
+                TrailId = trail.TrailId,
+                Name = trail.Name,
+                Description = trail.Description,
+                Difficulty = trail.Difficulty.ToString(),
+                DistanceMiles = trail.DistanceMiles,
+                Location = trail.Location,
+                Latitude = trail.Latitude,
+                Longitude = trail.Longitude
+            };
+
+            return Ok(trailDto);
+        }
+
+        // POST: api/trails
+        [HttpPost]
+        public async Task<ActionResult<TrailDto>> CreateTrail(CreateTrailDto createTrailDto)
+        {
+            if (!Enum.TryParse<Difficulty>(createTrailDto.Difficulty, true, out var difficulty))
+            {
+                return BadRequest("Invalid difficulty. Must be Easy, Moderate or Hard.");
+            }
+
+            var trail = new Trail
+            {
+                Name = createTrailDto.Name,
+                Description = createTrailDto.Description,
+                Difficulty = difficulty,
+                DistanceMiles = createTrailDto.DistanceMiles,
+                Location = createTrailDto.Location,
+                Latitude = createTrailDto.Latitude,
+                Longitude = createTrailDto.Longitude
+            };
+
+            var createdTrail = await _trailRepository.CreateTrailAsync(trail);
+
+            var trailDto = new TrailDto
+            {
+                TrailId = createdTrail.TrailId,
+                Name = createdTrail.Name,
+                Description = createdTrail.Description,
+                Difficulty = createdTrail.Difficulty.ToString(),
+                DistanceMiles = createdTrail.DistanceMiles,
+                Location = createdTrail.Location,
+                Latitude = createdTrail.Latitude,
+                Longitude = createdTrail.Longitude
+            };
+
+            return CreatedAtAction(nameof(GetTrailById), new { id = createdTrail.TrailId }, trailDto);
+        }
     }
 }
