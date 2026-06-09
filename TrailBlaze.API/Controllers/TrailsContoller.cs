@@ -10,10 +10,12 @@ namespace TrailBlaze.API.Controllers
     public class TrailsController : ControllerBase
     {
         private readonly ITrailRepository _trailRepository;
+        private readonly IReviewRepository _reviewRepository;
 
-        public TrailsController(ITrailRepository trailRepository)
+        public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository)
         {
             _trailRepository = trailRepository;
+            _reviewRepository = reviewRepository;
         }
 
         // GET: api/trails
@@ -153,6 +155,31 @@ namespace TrailBlaze.API.Controllers
             });
 
             return Ok(trailDtos);
+        }
+
+        // GET: api/trails/{id}/reviews
+        [HttpGet("{id}/reviews")]
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviewsForTrail(int id)
+        {
+            var trail = await _trailRepository.GetTrailByIdAsync(id);
+            if (trail == null)
+            {
+                return NotFound("Trail not found.");
+            }
+
+            var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(id);
+
+            var reviewDtos = reviews.Select(r => new ReviewDto
+            {
+                ReviewId = r.ReviewId,
+                TrailId = r.TrailId,
+                Comment = r.Comment,
+                Rating = r.Rating,
+                ImageUrl = r.ImageUrl,
+                DatePosted = r.DatePosted
+            });
+
+            return Ok(reviewDtos);
         }
     }
 }
