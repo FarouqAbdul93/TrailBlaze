@@ -65,5 +65,12 @@ namespace TrailBlaze.API.Repositories
                 .Where(t => t.Location.ToLower().Contains(location.ToLower()))
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Trail>> GetTrailsByDifficultyAsync(Difficulty difficulty)
+        {
+            return await _context.Trails
+                .Include(t => t.Reviews)
+                .Where(t => t.Difficulty == difficulty)
+                .ToListAsync();
+        }
     }
 }
