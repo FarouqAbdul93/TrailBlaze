@@ -1,0 +1,58 @@
+﻿@page "/trails/{TrailId:int}"
+<PageTitle>TrailBlaze - Trail Detail</PageTitle>
+
+<div class="trail-detail-container">
+
+    @if (trail == null)
+    {
+        <p>Loading trail...</p>
+    }
+    else
+    {
+        <div class="trail-detail">
+            <h1>🏔️ @trail.Name</h1>
+            <p>📍 <strong>Location:</strong> @trail.Location</p>
+            <p>📏 <strong>Distance:</strong> @trail.DistanceMiles miles</p>
+            <p>💪 <strong>Difficulty:</strong> @trail.Difficulty</p>
+            <p>📝 <strong>Description:</strong> @trail.Description</p>
+
+            <div class="trail-actions">
+                <button class="btn-directions">Get Directions</button>
+                <button class="btn-start">Start Hike</button>
+            </div>
+        </div>
+    }
+
+    <a href="/trails">← Back to Trails</a>
+</div>
+
+@code {
+    [Parameter]
+    public int TrailId { get; set; }
+
+    private TrailDetailDto? trail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Will connect to API later
+        trail = new TrailDetailDto
+        {
+            TrailId = TrailId,
+            Name = "Sample Trail",
+            Location = "Lake District",
+            DistanceMiles = 5.2,
+            Difficulty = "Moderate",
+            Description = "A beautiful trail through the Lake District."
+        };
+    }
+
+    public class TrailDetailDto
+    {
+        public int TrailId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public double DistanceMiles { get; set; }
+        public string Difficulty { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}
