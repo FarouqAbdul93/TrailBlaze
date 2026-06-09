@@ -57,5 +57,20 @@ namespace TrailBlaze.API.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Trail>> GetTrailsByLocationAsync(string location)
+        {
+            return await _context.Trails
+                .Include(t => t.Reviews)
+                .Where(t => t.Location.ToLower().Contains(location.ToLower()))
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Trail>> GetTrailsByDifficultyAsync(Difficulty difficulty)
+        {
+            return await _context.Trails
+                .Include(t => t.Reviews)
+                .Where(t => t.Difficulty == difficulty)
+                .ToListAsync();
+        }
     }
 }

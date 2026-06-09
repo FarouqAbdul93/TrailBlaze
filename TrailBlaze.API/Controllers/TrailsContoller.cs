@@ -99,5 +99,60 @@ namespace TrailBlaze.API.Controllers
 
             return CreatedAtAction(nameof(GetTrailById), new { id = createdTrail.TrailId }, trailDto);
         }
+        // GET: api/trails?location=
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrailsByLocation([FromQuery] string location)
+        {
+            if (string.IsNullOrWhiteSpace(location))
+            {
+                return BadRequest("Location parameter is required.");
+            }
+
+            var trails = await _trailRepository.GetTrailsByLocationAsync(location);
+
+            var trailDtos = trails.Select(t => new TrailDto
+            {
+                TrailId = t.TrailId,
+                Name = t.Name,
+                Description = t.Description,
+                Difficulty = t.Difficulty.ToString(),
+                DistanceMiles = t.DistanceMiles,
+                Location = t.Location,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude
+            });
+
+            return Ok(trailDtos);
+        }
+        // GET: api/trails/difficulty?difficulty=
+        [HttpGet("difficulty")]
+        public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrailsByDifficulty([FromQuery] string difficulty)
+        {
+            if (string.IsNullOrWhiteSpace(difficulty))
+            {
+                return BadRequest("Difficulty parameter is required.");
+            }
+
+            if (!Enum.TryParse<Difficulty>(difficulty, true, out var difficultyEnum))
+            {
+                return BadRequest("Invalid difficulty. Must be Easy, Moderate or Hard.");
+            }
+
+            var trails = await _trailRepository.GetTrailsByDifficultyAsync(difficultyEnum);
+
+            var trailDtos = trails.Select(t => new TrailDto
+            {
+                TrailId = t.TrailId,
+                Name = t.Name,
+                Description = t.Description,
+                Difficulty = t.Difficulty.ToString(),
+                DistanceMiles = t.DistanceMiles,
+                Location = t.Location,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude
+            });
+
+            return Ok(trailDtos);
+        }
     }
 }
