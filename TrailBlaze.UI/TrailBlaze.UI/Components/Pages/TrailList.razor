@@ -17,33 +17,18 @@
         <div class="trail-grid">
             @foreach (var trail in trails)
             {
-                <div class="trail-card">
-                    <h3>@trail.Name</h3>
-                    <p>📍 @trail.Location</p>
-                    <p>📏 @trail.DistanceMiles miles</p>
-                    <p>💪 @trail.Difficulty</p>
-                    <a href="/trails/@trail.TrailId">View Trail</a>
-                </div>
+                <TrailCard Trail="trail" />
             }
         </div>
     }
 </div>
 
 @code {
-    private List<TrailDto>? trails;
+    private List<TrailCard.TrailCardModel>? trails;
 
     protected override async Task OnInitializedAsync()
     {
         // Will connect to API later
-        trails = new List<TrailDto>();
-    }
-
-    public class TrailDto
-    {
-        public int TrailId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Location { get; set; } = string.Empty;
-        public double DistanceMiles { get; set; }
-        public string Difficulty { get; set; } = string.Empty;
+        trails = new List<TrailCard.TrailCardModel>();
     }
 }
