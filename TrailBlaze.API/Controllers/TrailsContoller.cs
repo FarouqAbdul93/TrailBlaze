@@ -36,5 +36,31 @@ namespace TrailBlaze.API.Controllers
 
             return Ok(trailDtos);
         }
+       
+        // GET: api/trails/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TrailDto>> GetTrailById(int id)
+        {
+            var trail = await _trailRepository.GetTrailByIdAsync(id);
+
+            if (trail == null)
+            {
+                return NotFound();
+            }
+
+            var trailDto = new TrailDto
+            {
+                TrailId = trail.TrailId,
+                Name = trail.Name,
+                Description = trail.Description,
+                Difficulty = trail.Difficulty.ToString(),
+                DistanceMiles = trail.DistanceMiles,
+                Location = trail.Location,
+                Latitude = trail.Latitude,
+                Longitude = trail.Longitude
+            };
+
+            return Ok(trailDto);
+        }
     }
 }
