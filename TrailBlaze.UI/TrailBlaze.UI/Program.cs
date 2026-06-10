@@ -1,5 +1,6 @@
-using TrailBlaze.UI.Components;
 using System.Net.Http;
+using TrailBlaze.UI.Components;
+using TrailBlaze.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,13 @@ builder.Services.AddHttpClient("TrailBlazeAPI", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7212/");
 });
+
+builder.Services.AddScoped<TrailService>(sp =>
+{
+    var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("TrailBlazeAPI");
+    return new TrailService(httpClient);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

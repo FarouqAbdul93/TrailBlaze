@@ -1,4 +1,6 @@
 ﻿@page "/trails"
+@inject TrailService TrailService
+@using TrailBlaze.UI.Services
 <PageTitle>TrailBlaze - Trails</PageTitle>
 
 <div class="trail-list-container">
@@ -17,18 +19,24 @@
         <div class="trail-grid">
             @foreach (var trail in trails)
             {
-                <TrailCard Trail="trail" />
-            }
+                <TrailCard Trail="new TrailCard.TrailCardModel
+                           {
+                               TrailId = trail.TrailId,
+                               Name = trail.Name,
+                               Location = trail.Location,
+                               DistanceMiles = trail.DistanceMiles,
+                               Difficulty = trail.Difficulty
+                           }" />
+                }
         </div>
     }
 </div>
 
 @code {
-    private List<TrailCard.TrailCardModel>? trails;
+    private List<TrailDto>? trails;
 
     protected override async Task OnInitializedAsync()
     {
-        // Will connect to API later
-        trails = new List<TrailCard.TrailCardModel>();
+        trails = await TrailService.GetTrailsAsync();
     }
 }
