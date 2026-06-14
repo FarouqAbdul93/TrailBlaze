@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TrailBlaze.API.Repositories;
 using TrailBlaze.API.Data_DbContext;
+using TrailBlaze.API.Repositories;
+using TrailBlaze.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<TrailBlazeDbContext>(options =>
 builder.Services.AddScoped<ITrailRepository, TrailRepository>();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddHttpClient<IOverpassService, OverpassService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
