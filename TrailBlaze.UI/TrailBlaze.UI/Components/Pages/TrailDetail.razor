@@ -1,4 +1,6 @@
 ﻿@page "/trails/{TrailId:int}"
+@inject TrailService TrailService
+@using TrailBlaze.UI.Services
 <PageTitle>TrailBlaze - Trail Detail</PageTitle>
 
 <div class="trail-detail-container">
@@ -30,29 +32,10 @@
     [Parameter]
     public int TrailId { get; set; }
 
-    private TrailDetailDto? trail;
+    private TrailDto? trail;
 
     protected override async Task OnInitializedAsync()
     {
-        // Will connect to API later
-        trail = new TrailDetailDto
-        {
-            TrailId = TrailId,
-            Name = "Sample Trail",
-            Location = "Lake District",
-            DistanceMiles = 5.2,
-            Difficulty = "Moderate",
-            Description = "A beautiful trail through the Lake District."
-        };
-    }
-
-    public class TrailDetailDto
-    {
-        public int TrailId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Location { get; set; } = string.Empty;
-        public double DistanceMiles { get; set; }
-        public string Difficulty { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        trail = await TrailService.GetTrailByIdAsync(TrailId);
     }
 }
