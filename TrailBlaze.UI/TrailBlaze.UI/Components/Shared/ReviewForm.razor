@@ -1,0 +1,75 @@
+﻿@using TrailBlaze.UI.Services
+@inject ReviewService ReviewService
+@rendermode InteractiveServer
+
+<div class="review-form">
+    <h3>Leave a Review</h3>
+
+    <div class="form-group">
+        <label>Rating</label>
+        <select @bind="rating" class="form-control">
+            <option value="1">⭐ 1 - Poor</option>
+            <option value="2">⭐⭐ 2 - Fair</option>
+            <option value="3">⭐⭐⭐ 3 - Good</option>
+            <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+            <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Comment</label>
+        <textarea @bind="comment"
+                  placeholder="Share your experience..."
+                  class="form-control"
+                  rows="4">
+        </textarea>
+    </div>
+
+    <button @onclick="SubmitReview" class="btn-submit">Submit Review</button>
+
+    @if (submitted)
+    {
+        <p class="success-message">✅ Review submitted successfully!</p>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-message">❌ @errorMessage</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int TrailId { get; set; }
+
+    private int rating = 5;
+    private string comment = "";
+    private bool submitted = false;
+    private string errorMessage = "";
+
+    private async Task SubmitReview()
+    {
+        submitted = false;
+        errorMessage = "";
+
+        var review = new TrailBlaze.UI.Services.CreateReviewDto
+        {
+            TrailId = TrailId,
+            Rating = rating,
+            Comment = comment
+        };
+
+        var success = await ReviewService.CreateReviewAsync(review);
+
+        if (success)
+        {
+            submitted = true;
+            comment = "";
+            rating = 5;
+        }
+        else
+        {
+            errorMessage = "Something went wrong. Please try again.";
+        }
+    }
+}

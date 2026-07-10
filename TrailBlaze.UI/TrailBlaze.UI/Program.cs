@@ -20,6 +20,12 @@ builder.Services.AddScoped<TrailService>(sp =>
     return new TrailService(httpClient);
 });
 
+builder.Services.AddScoped<ReviewService>(sp =>
+{
+    var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("TrailBlazeAPI");
+    return new ReviewService(httpClient);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
