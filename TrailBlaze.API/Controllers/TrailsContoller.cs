@@ -2,6 +2,7 @@
 using TrailBlaze.API.DataTransferObjects;
 using TrailBlaze.API.Models;
 using TrailBlaze.API.Repositories;
+using TrailBlaze.API.Services;
 
 namespace TrailBlaze.API.Controllers
 {
@@ -11,11 +12,12 @@ namespace TrailBlaze.API.Controllers
     {
         private readonly ITrailRepository _trailRepository;
         private readonly IReviewRepository _reviewRepository;
-
-        public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository)
+        private readonly IOverpassService _overpassService;
+        public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository, IOverpassService overpassService)
         {
             _trailRepository = trailRepository;
             _reviewRepository = reviewRepository;
+            _overpassService = overpassService;
         }
 
         // GET: api/trails
@@ -181,5 +183,6 @@ namespace TrailBlaze.API.Controllers
 
             return Ok(reviewDtos);
         }
+        
     }
 }
