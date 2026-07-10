@@ -13,6 +13,7 @@ namespace TrailBlaze.API.Controllers
         private readonly ITrailRepository _trailRepository;
         private readonly IReviewRepository _reviewRepository;
         private readonly IOverpassService _overpassService;
+
         public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository, IOverpassService overpassService)
         {
             _trailRepository = trailRepository;
@@ -26,21 +27,29 @@ namespace TrailBlaze.API.Controllers
         {
             var trails = await _trailRepository.GetAllTrailsAsync();
 
-            var trailDtos = trails.Select(t => new TrailDto
+            var trailDtos = new List<TrailDto>();
+            foreach (var t in trails)
             {
-                TrailId = t.TrailId,
-                Name = t.Name,
-                Description = t.Description,
-                Difficulty = t.Difficulty.ToString(),
-                DistanceMiles = t.DistanceMiles,
-                Location = t.Location,
-                Latitude = t.Latitude,
-                Longitude = t.Longitude
-            });
+                var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(t.TrailId);
+                var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
+                trailDtos.Add(new TrailDto
+                {
+                    TrailId = t.TrailId,
+                    Name = t.Name,
+                    Description = t.Description,
+                    Difficulty = t.Difficulty.ToString(),
+                    DistanceMiles = t.DistanceMiles,
+                    Location = t.Location,
+                    Latitude = t.Latitude,
+                    Longitude = t.Longitude,
+                    AverageRating = averageRating
+                });
+            }
 
             return Ok(trailDtos);
         }
-       
+
         // GET: api/trails/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<TrailDto>> GetTrailById(int id)
@@ -52,6 +61,9 @@ namespace TrailBlaze.API.Controllers
                 return NotFound();
             }
 
+            var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(trail.TrailId);
+            var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
             var trailDto = new TrailDto
             {
                 TrailId = trail.TrailId,
@@ -61,7 +73,8 @@ namespace TrailBlaze.API.Controllers
                 DistanceMiles = trail.DistanceMiles,
                 Location = trail.Location,
                 Latitude = trail.Latitude,
-                Longitude = trail.Longitude
+                Longitude = trail.Longitude,
+                AverageRating = averageRating
             };
 
             return Ok(trailDto);
@@ -98,12 +111,14 @@ namespace TrailBlaze.API.Controllers
                 DistanceMiles = createdTrail.DistanceMiles,
                 Location = createdTrail.Location,
                 Latitude = createdTrail.Latitude,
-                Longitude = createdTrail.Longitude
+                Longitude = createdTrail.Longitude,
+                AverageRating = 0
             };
 
             return CreatedAtAction(nameof(GetTrailById), new { id = createdTrail.TrailId }, trailDto);
         }
-        // GET: api/trails?location=
+
+        // GET: api/trails/search?location=
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrailsByLocation([FromQuery] string location)
         {
@@ -114,20 +129,29 @@ namespace TrailBlaze.API.Controllers
 
             var trails = await _trailRepository.GetTrailsByLocationAsync(location);
 
-            var trailDtos = trails.Select(t => new TrailDto
+            var trailDtos = new List<TrailDto>();
+            foreach (var t in trails)
             {
-                TrailId = t.TrailId,
-                Name = t.Name,
-                Description = t.Description,
-                Difficulty = t.Difficulty.ToString(),
-                DistanceMiles = t.DistanceMiles,
-                Location = t.Location,
-                Latitude = t.Latitude,
-                Longitude = t.Longitude
-            });
+                var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(t.TrailId);
+                var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
+                trailDtos.Add(new TrailDto
+                {
+                    TrailId = t.TrailId,
+                    Name = t.Name,
+                    Description = t.Description,
+                    Difficulty = t.Difficulty.ToString(),
+                    DistanceMiles = t.DistanceMiles,
+                    Location = t.Location,
+                    Latitude = t.Latitude,
+                    Longitude = t.Longitude,
+                    AverageRating = averageRating
+                });
+            }
 
             return Ok(trailDtos);
         }
+
         // GET: api/trails/difficulty?difficulty=
         [HttpGet("difficulty")]
         public async Task<ActionResult<IEnumerable<TrailDto>>> GetTrailsByDifficulty([FromQuery] string difficulty)
@@ -144,17 +168,25 @@ namespace TrailBlaze.API.Controllers
 
             var trails = await _trailRepository.GetTrailsByDifficultyAsync(difficultyEnum);
 
-            var trailDtos = trails.Select(t => new TrailDto
+            var trailDtos = new List<TrailDto>();
+            foreach (var t in trails)
             {
-                TrailId = t.TrailId,
-                Name = t.Name,
-                Description = t.Description,
-                Difficulty = t.Difficulty.ToString(),
-                DistanceMiles = t.DistanceMiles,
-                Location = t.Location,
-                Latitude = t.Latitude,
-                Longitude = t.Longitude
-            });
+                var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(t.TrailId);
+                var averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
+                trailDtos.Add(new TrailDto
+                {
+                    TrailId = t.TrailId,
+                    Name = t.Name,
+                    Description = t.Description,
+                    Difficulty = t.Difficulty.ToString(),
+                    DistanceMiles = t.DistanceMiles,
+                    Location = t.Location,
+                    Latitude = t.Latitude,
+                    Longitude = t.Longitude,
+                    AverageRating = averageRating
+                });
+            }
 
             return Ok(trailDtos);
         }
@@ -183,6 +215,5 @@ namespace TrailBlaze.API.Controllers
 
             return Ok(reviewDtos);
         }
-        
     }
 }

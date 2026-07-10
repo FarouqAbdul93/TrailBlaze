@@ -42,5 +42,6 @@ namespace TrailBlaze.UI.Services
         public string Description { get; set; } = string.Empty;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public double AverageRating { get; set; }
     }
 }

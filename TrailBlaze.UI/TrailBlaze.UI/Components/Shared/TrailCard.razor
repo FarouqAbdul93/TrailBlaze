@@ -5,14 +5,18 @@
     <p>💪 @Trail.Difficulty</p>
     @if (Trail.AverageRating > 0)
     {
-        <p>⭐ @Trail.AverageRating / 5</p>
+        <p>⭐ @Trail.AverageRating.ToString("0.0") / 5</p>
+    }
+    else
+    {
+        <p>⭐ No ratings yet</p>
     }
     <a href="/trails/@Trail.TrailId" class="btn-view">View Trail</a>
 </div>
 
 @code {
     [Parameter]
-    public TrailCardModel Trail { get; set; } = new();
+    public TrailCard.TrailCardModel Trail { get; set; } = new();
 
     public class TrailCardModel
     {

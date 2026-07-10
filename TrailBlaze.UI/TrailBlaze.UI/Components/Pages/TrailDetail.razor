@@ -18,6 +18,7 @@
             <p>📏 <strong>Distance:</strong> @trail.DistanceMiles miles</p>
             <p>💪 <strong>Difficulty:</strong> @trail.Difficulty</p>
             <p>📝 <strong>Description:</strong> @trail.Description</p>
+            <p>⭐ <strong>Rating:</strong> @(trail.AverageRating > 0 ? trail.AverageRating.ToString("0.0") + " / 5" : "No ratings yet")</p>
 
             <button onclick="@($"showAndInitMap('{mapboxToken}', {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
 
