@@ -40,5 +40,7 @@ namespace TrailBlaze.UI.Services
         public double DistanceMiles { get; set; }
         public string Difficulty { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 }
