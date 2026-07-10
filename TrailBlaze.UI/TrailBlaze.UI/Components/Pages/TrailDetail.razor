@@ -1,10 +1,10 @@
 ﻿@page "/trails/{TrailId:int}"
 @inject TrailService TrailService
+@inject IJSRuntime JS
 @using TrailBlaze.UI.Services
 <PageTitle>TrailBlaze - Trail Detail</PageTitle>
 
 <div class="trail-detail-container">
-
     @if (trail == null)
     {
         <p>Loading trail...</p>
@@ -18,8 +18,12 @@
             <p>💪 <strong>Difficulty:</strong> @trail.Difficulty</p>
             <p>📝 <strong>Description:</strong> @trail.Description</p>
 
-            <div class="trail-actions">
-                <button class="btn-directions">Get Directions</button>
+            <button onclick="@($"showAndInitMap('{mapboxToken}', {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
+
+            <div id="map" style="width:100%; height:400px; margin-top:20px; display:none;"></div>
+
+            <div class="trail-actions" style="margin-top:20px;">
+                <button class="btn-directions" @onclick="GetDirections">Get Directions</button>
                 <button class="btn-start">Start Hike</button>
             </div>
         </div>
@@ -33,9 +37,18 @@
     public int TrailId { get; set; }
 
     private TrailDto? trail;
+    private string mapboxToken = "pk.eyJ1IjoiZmFyb3VxaGE5MyIsImEiOiJjbXJmNDc4NTkwNG82Mnpxd2NobjNreHpjIn0.yTAsRJ0rfJI-Lt91CNaJOQ";
 
     protected override async Task OnInitializedAsync()
     {
         trail = await TrailService.GetTrailByIdAsync(TrailId);
+    }
+
+    private async Task GetDirections()
+    {
+        if (trail != null)
+        {
+            await JS.InvokeVoidAsync("showAndInitMap", mapboxToken, trail.Latitude, trail.Longitude, trail.Name);
+        }
     }
 }
