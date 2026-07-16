@@ -1,9 +1,11 @@
 ﻿@page "/trails/{TrailId:int}"
 @inject TrailService TrailService
+@inject ReviewService ReviewService
 @inject IJSRuntime JS
 @inject IConfiguration Configuration
 @using TrailBlaze.UI.Services
 <PageTitle>TrailBlaze - Trail Detail</PageTitle>
+
 <div class="trail-detail-container">
     @if (trail == null)
     {
@@ -18,34 +20,68 @@
             <p>💪 <strong>Difficulty:</strong> @trail.Difficulty</p>
             <p>📝 <strong>Description:</strong> @trail.Description</p>
             <p>⭐ <strong>Rating:</strong> @(trail.AverageRating > 0 ? trail.AverageRating.ToString("0.0") + " / 5" : "No ratings yet")</p>
+
             <button onclick="@($"showAndInitMap('{mapboxToken}', {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
             <div id="map" style="width:100%; height:400px; margin-top:20px; display:none;"></div>
+
             <div class="trail-actions" style="margin-top:20px;">
                 <button class="btn-directions" @onclick="GetDirections">Get Directions</button>
                 <button class="btn-start">Start Hike</button>
             </div>
+
+            @if (trailImages.Any())
+            {
+                <div style="margin-top:30px;">
+                    <h3>📸 Trail Photos</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                        @foreach (var imageUrl in trailImages)
+                        {
+                            <img src="@imageUrl"
+                                 alt="Trail photo for @trail.Name"
+                                 style="width:200px; height:150px; object-fit:cover; border-radius:8px;" />
+                        }
+                    </div>
+                </div>
+            }
+
             <div style="margin-top:30px;">
                 <ReviewForm TrailId="TrailId" />
             </div>
+
             <div style="margin-top:30px;">
                 <ImageUpload TrailId="TrailId" OnImageUploaded="HandleImageUploaded" />
             </div>
         </div>
     }
+
     <a href="/trails">← Back to Trails</a>
 </div>
 
 @code {
     [Parameter]
     public int TrailId { get; set; }
+
     private TrailDto? trail;
     private string mapboxToken = "";
-    private List<string> uploadedImages = new();
+    private List<string> trailImages = new();
 
     protected override async Task OnInitializedAsync()
     {
         mapboxToken = Configuration["MapboxToken"] ?? "";
         trail = await TrailService.GetTrailByIdAsync(TrailId);
+        await LoadTrailImages();
+    }
+
+    private async Task LoadTrailImages()
+    {
+        var reviews = await ReviewService.GetReviewsByTrailIdAsync(TrailId);
+        if (reviews != null)
+        {
+            trailImages = reviews
+                .Where(r => !string.IsNullOrEmpty(r.ImageUrl))
+                .Select(r => r.ImageUrl!)
+                .ToList();
+        }
     }
 
     private async Task GetDirections()
@@ -58,8 +94,7 @@
 
     private async Task HandleImageUploaded(string imageUrl)
     {
-        uploadedImages.Add(imageUrl);
+        await LoadTrailImages();
         StateHasChanged();
-        await Task.CompletedTask;
     }
 }

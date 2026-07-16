@@ -1,3 +1,363 @@
+/* ===== BASE STYLES ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f0;
+    color: #2c3e2d;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: #2c3e2d;
+    font-weight: 700;
+}
+
+a {
+    color: #4a7c59;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: #2c5f3a;
+        text-decoration: underline;
+    }
+
+/* ===== NAVBAR ===== */
+.navbar {
+    background-color: #2c3e2d;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.navbar-brand a {
+    color: #f0e6c8;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+    .navbar-brand a:hover {
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+.navbar-links {
+    display: flex;
+    gap: 2rem;
+}
+
+    .navbar-links a {
+        color: #c8d8c8;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .navbar-links a:hover {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+/* ===== MAIN CONTENT ===== */
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ===== HOME PAGE ===== */
+.home-container {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+    .home-container h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #2c3e2d;
+    }
+
+    .home-container p {
+        font-size: 1.1rem;
+        color: #5a7a5a;
+        margin-bottom: 2rem;
+    }
+
+.search-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        color: #2c3e2d;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border: 1.5px solid #c8d8c8;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fafff8;
+    transition: border-color 0.2s;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4a7c59;
+        box-shadow: 0 0 0 3px rgba(74,124,89,0.15);
+    }
+
+.btn-search {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+}
+
+    .btn-search:hover {
+        background-color: #2c5f3a;
+    }
+
+/* ===== TRAIL LIST ===== */
+.trail-list-container h1 {
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+.trail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ===== TRAIL CARD ===== */
+.trail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid #4a7c59;
+}
+
+    .trail-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .trail-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+        color: #2c3e2d;
+    }
+
+    .trail-card p {
+        margin-bottom: 0.4rem;
+        color: #5a7a5a;
+        font-size: 0.95rem;
+    }
+
+.btn-view {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.2rem;
+    background-color: #4a7c59;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+    .btn-view:hover {
+        background-color: #2c5f3a;
+        color: white;
+        text-decoration: none;
+    }
+
+/* ===== TRAIL DETAIL ===== */
+.trail-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.trail-detail {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+    .trail-detail h1 {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+        color: #2c3e2d;
+    }
+
+    .trail-detail p {
+        margin-bottom: 0.6rem;
+        font-size: 1rem;
+        color: #3a5a3a;
+    }
+
+.btn-map {
+    margin-top: 1rem;
+    padding: 0.6rem 1.4rem;
+    background-color: #5a8a6a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .btn-map:hover {
+        background-color: #2c5f3a;
+    }
+
+.trail-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-directions {
+    padding: 0.6rem 1.4rem;
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .btn-directions:hover {
+        background-color: #2c5f3a;
+    }
+
+.btn-start {
+    padding: 0.6rem 1.4rem;
+    background-color: #e8a020;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .btn-start:hover {
+        background-color: #c07818;
+    }
+
+/* ===== REVIEW FORM ===== */
+.review-form {
+    background: #f8fdf8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1.5px solid #c8d8c8;
+}
+
+    .review-form h3 {
+        margin-bottom: 1rem;
+        color: #2c3e2d;
+    }
+
+.btn-submit {
+    padding: 0.6rem 1.4rem;
+    background-color: #4a7c59;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+}
+
+    .btn-submit:hover {
+        background-color: #2c5f3a;
+    }
+
+.success-message {
+    color: #2c7a2c;
+    font-weight: 600;
+    margin-top: 0.8rem;
+}
+
+.error-message {
+    color: #c0392b;
+    font-weight: 600;
+    margin-top: 0.8rem;
+}
+
+/* ===== IMAGE UPLOAD ===== */
+.image-upload {
+    background: #f8fdf8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1.5px solid #c8d8c8;
+}
+
+    .image-upload h3 {
+        margin-bottom: 1rem;
+        color: #2c3e2d;
+    }
+
+.btn-upload {
+    padding: 0.6rem 1.4rem;
+    background-color: #5a8a6a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+}
+
+    .btn-upload:hover {
+        background-color: #2c5f3a;
+    }
+
+/* ===== BLAZOR ERROR ===== */
 h1:focus {
     outline: none;
 }
