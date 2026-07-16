@@ -1,18 +1,20 @@
-﻿<div class="trail-card">
+﻿<article class="trail-card" aria-label="Trail: @Trail.Name">
     <h3>@Trail.Name</h3>
-    <p>📍 @Trail.Location</p>
-    <p>📏 @Trail.DistanceMiles miles</p>
-    <p>💪 @Trail.Difficulty</p>
+    <p><span aria-hidden="true">📍</span> <span class="sr-only">Location:</span> @Trail.Location</p>
+    <p><span aria-hidden="true">📏</span> <span class="sr-only">Distance:</span> @Trail.DistanceMiles miles</p>
+    <p><span aria-hidden="true">💪</span> <span class="sr-only">Difficulty:</span> @Trail.Difficulty</p>
     @if (Trail.AverageRating > 0)
     {
-        <p>⭐ @Trail.AverageRating.ToString("0.0") / 5</p>
+        <p><span aria-hidden="true">⭐</span> <span class="sr-only">Rating:</span> @Trail.AverageRating.ToString("0.0") / 5</p>
     }
     else
     {
-        <p>⭐ No ratings yet</p>
+        <p><span aria-hidden="true">⭐</span> No ratings yet</p>
     }
-    <a href="/trails/@Trail.TrailId" class="btn-view">View Trail</a>
-</div>
+    <a href="/trails/@Trail.TrailId"
+       class="btn-view"
+       aria-label="View details for @Trail.Name">View Trail</a>
+</article>
 
 @code {
     [Parameter]

@@ -2,12 +2,15 @@
 @inject ReviewService ReviewService
 @rendermode InteractiveServer
 
-<div class="review-form">
+<div class="review-form" role="form" aria-label="Leave a review for this trail">
     <h3>Leave a Review</h3>
 
     <div class="form-group">
-        <label>Rating</label>
-        <select @bind="rating" class="form-control">
+        <label for="ratingSelect">Rating</label>
+        <select id="ratingSelect"
+                @bind="rating"
+                class="form-control"
+                aria-label="Select a rating from 1 to 5">
             <option value="1">⭐ 1 - Poor</option>
             <option value="2">⭐⭐ 2 - Fair</option>
             <option value="3">⭐⭐⭐ 3 - Good</option>
@@ -17,24 +20,30 @@
     </div>
 
     <div class="form-group">
-        <label>Comment</label>
-        <textarea @bind="comment"
+        <label for="commentTextarea">Comment</label>
+        <textarea id="commentTextarea"
+                  @bind="comment"
                   placeholder="Share your experience..."
                   class="form-control"
-                  rows="4">
+                  rows="4"
+                  aria-label="Write a comment about your experience">
         </textarea>
     </div>
 
-    <button @onclick="SubmitReview" class="btn-submit">Submit Review</button>
+    <button @onclick="SubmitReview"
+            class="btn-submit"
+            aria-label="Submit your review">
+        Submit Review
+    </button>
 
     @if (submitted)
     {
-        <p class="success-message">✅ Review submitted successfully!</p>
+        <p class="success-message" role="alert" aria-live="polite">✅ Review submitted successfully!</p>
     }
 
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <p class="error-message">❌ @errorMessage</p>
+        <p class="error-message" role="alert" aria-live="assertive">❌ @errorMessage</p>
     }
 </div>
 

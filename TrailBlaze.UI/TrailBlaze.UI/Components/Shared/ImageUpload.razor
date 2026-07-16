@@ -3,21 +3,28 @@
 @inject IConfiguration Configuration
 @rendermode InteractiveServer
 
-<div class="image-upload">
+<div class="image-upload" role="region" aria-label="Upload a photo of this trail">
     <h3>Upload a Photo</h3>
 
     <input type="hidden" id="trailIdInput" value="@TrailId" />
 
     <div class="form-group">
-        <label>Select an image</label>
-        <input type="file" id="imageFileInput" accept="image/*" class="form-control" />
+        <label for="imageFileInput">Select an image</label>
+        <input type="file"
+               id="imageFileInput"
+               accept="image/*"
+               class="form-control"
+               aria-label="Choose an image file to upload" />
     </div>
 
-    <button onclick="uploadToCloudinary()" class="btn-upload" style="margin-top:10px;">
+    <button onclick="uploadToCloudinary()"
+            class="btn-upload"
+            style="margin-top:10px;"
+            aria-label="Upload selected photo to this trail">
         Upload Photo
     </button>
 
-    <p id="uploadStatus"></p>
+    <p id="uploadStatus" role="status" aria-live="polite"></p>
 </div>
 
 @code {
