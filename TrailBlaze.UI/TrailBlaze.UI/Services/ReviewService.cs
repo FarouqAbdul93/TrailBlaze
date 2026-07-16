@@ -36,6 +36,7 @@ namespace TrailBlaze.UI.Services
         public int TrailId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
         public DateTime DatePosted { get; set; }
     }
 }
