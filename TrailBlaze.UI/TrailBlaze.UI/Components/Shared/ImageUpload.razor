@@ -1,0 +1,40 @@
+﻿@using TrailBlaze.UI.Services
+@inject IJSRuntime JS
+@inject IConfiguration Configuration
+@rendermode InteractiveServer
+
+<div class="image-upload">
+    <h3>Upload a Photo</h3>
+
+    <input type="hidden" id="trailIdInput" value="@TrailId" />
+
+    <div class="form-group">
+        <label>Select an image</label>
+        <input type="file" id="imageFileInput" accept="image/*" class="form-control" />
+    </div>
+
+    <button onclick="uploadToCloudinary()" class="btn-upload" style="margin-top:10px;">
+        Upload Photo
+    </button>
+
+    <p id="uploadStatus"></p>
+</div>
+
+@code {
+    [Parameter]
+    public int TrailId { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnImageUploaded { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var cloudName = Configuration["Cloudinary:CloudName"];
+            var uploadPreset = Configuration["Cloudinary:UploadPreset"];
+            var apiBaseUrl = "https://localhost:7212/";
+            await JS.InvokeVoidAsync("initCloudinaryUpload", cloudName, uploadPreset, apiBaseUrl);
+        }
+    }
+}

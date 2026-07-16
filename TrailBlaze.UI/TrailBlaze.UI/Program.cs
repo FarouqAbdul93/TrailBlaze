@@ -1,13 +1,16 @@
-using System.Net.Http;
 using TrailBlaze.UI.Components;
 using TrailBlaze.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddServerSideBlazor(options =>
+{
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(2);
+});
 
 builder.Services.AddHttpClient("TrailBlazeAPI", client =>
 {
@@ -26,6 +29,13 @@ builder.Services.AddScoped<ReviewService>(sp =>
     return new ReviewService(httpClient);
 });
 
+builder.Services.AddScoped<CloudinaryService>(sp =>
+{
+    var httpClient = new HttpClient();
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    return new CloudinaryService(httpClient, configuration);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,12 +46,10 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 

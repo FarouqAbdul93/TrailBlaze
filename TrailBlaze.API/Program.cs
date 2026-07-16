@@ -8,13 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<TrailBlazeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorUI", policy =>
+    {
+        policy.WithOrigins("https://localhost:7239", "http://localhost:5158")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddScoped<ITrailRepository, TrailRepository>();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddHttpClient<IOverpassService, OverpassService>();
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,10 +38,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowBlazorUI");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

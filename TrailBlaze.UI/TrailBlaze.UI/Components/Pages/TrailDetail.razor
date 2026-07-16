@@ -4,7 +4,6 @@
 @inject IConfiguration Configuration
 @using TrailBlaze.UI.Services
 <PageTitle>TrailBlaze - Trail Detail</PageTitle>
-
 <div class="trail-detail-container">
     @if (trail == null)
     {
@@ -19,31 +18,29 @@
             <p>💪 <strong>Difficulty:</strong> @trail.Difficulty</p>
             <p>📝 <strong>Description:</strong> @trail.Description</p>
             <p>⭐ <strong>Rating:</strong> @(trail.AverageRating > 0 ? trail.AverageRating.ToString("0.0") + " / 5" : "No ratings yet")</p>
-
             <button onclick="@($"showAndInitMap('{mapboxToken}', {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
-
             <div id="map" style="width:100%; height:400px; margin-top:20px; display:none;"></div>
-
             <div class="trail-actions" style="margin-top:20px;">
                 <button class="btn-directions" @onclick="GetDirections">Get Directions</button>
                 <button class="btn-start">Start Hike</button>
             </div>
-
             <div style="margin-top:30px;">
                 <ReviewForm TrailId="TrailId" />
             </div>
+            <div style="margin-top:30px;">
+                <ImageUpload TrailId="TrailId" OnImageUploaded="HandleImageUploaded" />
+            </div>
         </div>
     }
-
     <a href="/trails">← Back to Trails</a>
 </div>
 
 @code {
     [Parameter]
     public int TrailId { get; set; }
-
     private TrailDto? trail;
     private string mapboxToken = "";
+    private List<string> uploadedImages = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,5 +54,12 @@
         {
             await JS.InvokeVoidAsync("showAndInitMap", mapboxToken, trail.Latitude, trail.Longitude, trail.Name);
         }
+    }
+
+    private async Task HandleImageUploaded(string imageUrl)
+    {
+        uploadedImages.Add(imageUrl);
+        StateHasChanged();
+        await Task.CompletedTask;
     }
 }

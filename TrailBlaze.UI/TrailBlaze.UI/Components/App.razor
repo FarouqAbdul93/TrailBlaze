@@ -13,6 +13,73 @@
     <Routes />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="mapbox.js"></script>
+    <script>
+        window.readFileAsBase64 = function(inputId) {
+            return new Promise((resolve, reject) => {
+                const input = document.getElementById(inputId);
+                if (!input || !input.files || !input.files[0]) {
+                    reject('No file selected');
+                    return;
+                }
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.initCloudinaryUpload = function(cloudName, uploadPreset, apiBaseUrl) {
+            window.uploadToCloudinary = function() {
+                const input = document.getElementById('imageFileInput');
+                if (!input || !input.files || !input.files[0]) {
+                    document.getElementById('uploadStatus').innerText = 'Please select a file first';
+                    return;
+                }
+
+                const file = input.files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', uploadPreset);
+
+                document.getElementById('uploadStatus').innerText = 'Uploading...';
+
+                fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.secure_url) {
+                        const trailId = parseInt(document.getElementById('trailIdInput').value);
+
+                        fetch(`${apiBaseUrl}api/Reviews`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                trailId: trailId,
+                                rating: 5,
+                                comment: '',
+                                imageUrl: data.secure_url
+                            })
+                        })
+                        .then(() => {
+                            document.getElementById('uploadStatus').innerText = '✅ Photo uploaded successfully!';
+                            console.log('Uploaded:', data.secure_url);
+                        })
+                        .catch(error => {
+                            document.getElementById('uploadStatus').innerText = '✅ Photo uploaded but failed to save: ' + error.message;
+                        });
+                    } else {
+                        document.getElementById('uploadStatus').innerText = '❌ Upload failed: ' + JSON.stringify(data);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('uploadStatus').innerText = '❌ Error: ' + error.message;
+                });
+            };
+        };
+    </script>
     <script src="_framework/blazor.web.js"></script>
 </body>
 </html>
