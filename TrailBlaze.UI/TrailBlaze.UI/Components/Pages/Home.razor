@@ -8,18 +8,23 @@
     <h1>🏔️ Find Your Perfect Trail</h1>
     <p>Discover walking and hiking trails across the UK</p>
 
-    <div class="search-form">
+    <div class="search-form" role="search">
         <div class="form-group">
-            <label>Location</label>
+            <label for="locationInput">Location</label>
             <input type="text"
+                   id="locationInput"
                    @bind="location"
                    placeholder="e.g. Lake District, Peak District"
-                   class="form-control" />
+                   class="form-control"
+                   aria-label="Enter location to search for trails" />
         </div>
 
         <div class="form-group">
-            <label>Difficulty</label>
-            <select @bind="difficulty" class="form-control">
+            <label for="difficultySelect">Difficulty</label>
+            <select id="difficultySelect"
+                    @bind="difficulty"
+                    class="form-control"
+                    aria-label="Select trail difficulty">
                 <option value="">All Difficulties</option>
                 <option value="Easy">Easy</option>
                 <option value="Moderate">Moderate</option>
@@ -27,7 +32,9 @@
             </select>
         </div>
 
-        <button @onclick="SearchTrails" class="btn-search">
+        <button @onclick="SearchTrails"
+                class="btn-search"
+                aria-label="Search for trails">
             Search Trails
         </button>
     </div>
