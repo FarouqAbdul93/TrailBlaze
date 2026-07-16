@@ -40,3 +40,18 @@ window.showAndInitMap = function (token, latitude, longitude, trailName) {
     }
     window.loadMapbox(token, latitude, longitude, trailName);
 };
+
+window.readFileAsBase64 = function (inputId) {
+    return new Promise((resolve, reject) => {
+        const input = document.getElementById(inputId);
+        if (!input || !input.files || !input.files[0]) {
+            reject('No file selected');
+            return;
+        }
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
