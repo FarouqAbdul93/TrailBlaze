@@ -6,23 +6,23 @@ namespace TrailBlaze.API.Services
     public class OverpassService : IOverpassService
     {
         private readonly HttpClient _httpClient;
-        private const string OverpassUrl = "https://overpass.kumi.systems/api/interpreter";
+        private const string OverpassUrl = "https://maps.mail.ru/osm/tools/overpass/api/interpreter";
 
         public OverpassService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.Timeout = TimeSpan.FromSeconds(30);
+            _httpClient.Timeout = TimeSpan.FromSeconds(60);
             _httpClient.DefaultRequestVersion = System.Net.HttpVersion.Version11;
 
             if (!_httpClient.DefaultRequestHeaders.UserAgent.Any())
             {
-                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("TrailBlazeApp/1.0 (contact: ebrahim@example.com)");
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("TrailBlazeApp/1.0 (contact: trailblaze@example.com)");
             }
         }
 
         public async Task<IEnumerable<OverpassTrailResultDto>> GetHikingTrailsAsync(double latitude, double longitude, int radiusMeters)
         {
-            var query = $@"[out:json][timeout:25];way[highway=path](around:{radiusMeters},{latitude},{longitude});out geom;";
+            var query = $@"[out:json][timeout:50];(way[""highway""=""path""](around:{radiusMeters},{latitude},{longitude});way[""highway""=""footway""](around:{radiusMeters},{latitude},{longitude}););out geom;";
 
             var content = new FormUrlEncodedContent(new[]
             {
@@ -54,7 +54,6 @@ namespace TrailBlaze.API.Services
                     : "Unnamed Trail";
 
                 var distanceMiles = CalculateDistanceMiles(element.Geometry);
-
                 var start = element.Geometry.First();
                 var end = element.Geometry.Last();
 
@@ -62,7 +61,7 @@ namespace TrailBlaze.API.Services
                 {
                     OsmId = element.Id,
                     Name = name,
-                    DistanceMiles = distanceMiles,
+                    DistanceMiles = Math.Round(distanceMiles, 2),
                     StartLatitude = start.Lat,
                     StartLongitude = start.Lon,
                     EndLatitude = end.Lat,
@@ -71,34 +70,28 @@ namespace TrailBlaze.API.Services
                 });
             }
 
-            return results;
+            return results.Take(20).ToList();
         }
 
         private static double CalculateDistanceMiles(List<OverpassGeometryDto> points)
         {
             double totalMeters = 0;
-
             for (int i = 0; i < points.Count - 1; i++)
             {
                 totalMeters += HaversineDistance(points[i].Lat, points[i].Lon, points[i + 1].Lat, points[i + 1].Lon);
             }
-
-            return totalMeters / 1609.34; // convert meters to miles
+            return totalMeters / 1609.34;
         }
 
         private static double HaversineDistance(double lat1, double lon1, double lat2, double lon2)
         {
             const double earthRadiusMeters = 6371000;
-
             var dLat = ToRadians(lat2 - lat1);
             var dLon = ToRadians(lon2 - lon1);
-
             var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
                     Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
                     Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
             return earthRadiusMeters * c;
         }
 

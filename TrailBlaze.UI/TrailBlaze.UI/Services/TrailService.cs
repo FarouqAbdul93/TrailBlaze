@@ -30,6 +30,11 @@ namespace TrailBlaze.UI.Services
         {
             return await _httpClient.GetFromJsonAsync<List<TrailDto>>($"api/Trails/difficulty?difficulty={difficulty}");
         }
+
+        public async Task<List<LiveTrailDto>?> LiveSearchTrailsAsync(string location)
+        {
+            return await _httpClient.GetFromJsonAsync<List<LiveTrailDto>>($"api/Trails/live-search?location={location}");
+        }
     }
 
     public class TrailDto
@@ -43,5 +48,17 @@ namespace TrailBlaze.UI.Services
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public double AverageRating { get; set; }
+    }
+
+    public class LiveTrailDto
+    {
+        public long OsmId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public double DistanceMiles { get; set; }
+        public double StartLatitude { get; set; }
+        public double StartLongitude { get; set; }
+        public double EndLatitude { get; set; }
+        public double EndLongitude { get; set; }
+        public string RouteData { get; set; } = string.Empty;
     }
 }

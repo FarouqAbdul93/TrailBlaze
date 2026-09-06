@@ -25,7 +25,7 @@ builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddHttpClient<IOverpassService, OverpassService>();
 builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-
+builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

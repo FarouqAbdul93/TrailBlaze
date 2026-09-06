@@ -2,6 +2,7 @@
 @inject TrailService TrailService
 @inject NavigationManager Navigation
 @using TrailBlaze.UI.Services
+@rendermode InteractiveServer
 <PageTitle>TrailBlaze - Find Your Trail</PageTitle>
 
 <div class="home-container">
@@ -14,6 +15,7 @@
             <input type="text"
                    id="locationInput"
                    @bind="location"
+                   @bind:event="oninput"
                    placeholder="e.g. Lake District, Peak District"
                    class="form-control"
                    aria-label="Enter location to search for trails" />

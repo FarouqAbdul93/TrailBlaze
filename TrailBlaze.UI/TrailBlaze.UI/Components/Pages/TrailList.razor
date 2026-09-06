@@ -1,20 +1,32 @@
 ﻿@page "/trails"
 @inject TrailService TrailService
+@inject NavigationManager Navigation
 @using TrailBlaze.UI.Services
+@using Microsoft.AspNetCore.WebUtilities
 <PageTitle>TrailBlaze - Trails</PageTitle>
 
 <div class="trail-list-container">
     <h1>🥾 Trails</h1>
 
-    @if (trails == null)
+    @if (isLoading)
     {
-        <p>Loading trails...</p>
+        <p>Searching for trails... please wait</p>
     }
-    else if (!trails.Any())
+    else if (liveTrails != null && liveTrails.Any())
     {
-        <p>No trails found. Try a different search.</p>
+        <p>Found <strong>@liveTrails.Count</strong> trails near <strong>@searchLocation</strong></p>
+        <div class="trail-grid">
+            @foreach (var trail in liveTrails)
+            {
+                <div class="trail-card">
+                    <h3>@trail.Name</h3>
+                    <p>📏 @trail.DistanceMiles miles</p>
+                    <p>📍 @searchLocation</p>
+                </div>
+            }
+        </div>
     }
-    else
+    else if (trails != null && trails.Any())
     {
         <div class="trail-grid">
             @foreach (var trail in trails)
@@ -31,13 +43,33 @@
                 }
         </div>
     }
+    else if (!isLoading)
+    {
+        <p>No trails found. Try a different search.</p>
+    }
 </div>
 
 @code {
     private List<TrailDto>? trails;
+    private List<LiveTrailDto>? liveTrails;
+    private string searchLocation = "";
+    private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        trails = await TrailService.GetTrailsAsync();
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("location", out var location) && !string.IsNullOrEmpty(location))
+        {
+            searchLocation = location!;
+            isLoading = true;
+            liveTrails = await TrailService.LiveSearchTrailsAsync(searchLocation);
+            isLoading = false;
+        }
+        else
+        {
+            trails = await TrailService.GetTrailsAsync();
+        }
     }
 }

@@ -13,12 +13,14 @@ namespace TrailBlaze.API.Controllers
         private readonly ITrailRepository _trailRepository;
         private readonly IReviewRepository _reviewRepository;
         private readonly IOverpassService _overpassService;
+        private readonly IGeocodingService _geocodingService;
 
-        public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository, IOverpassService overpassService)
+        public TrailsController(ITrailRepository trailRepository, IReviewRepository reviewRepository, IOverpassService overpassService, IGeocodingService geocodingService)
         {
             _trailRepository = trailRepository;
             _reviewRepository = reviewRepository;
             _overpassService = overpassService;
+            _geocodingService = geocodingService;
         }
 
         // GET: api/trails
@@ -189,6 +191,30 @@ namespace TrailBlaze.API.Controllers
             }
 
             return Ok(trailDtos);
+        }
+
+        // GET: api/trails/live-search?location=
+        [HttpGet("live-search")]
+        public async Task<ActionResult<IEnumerable<OverpassTrailResultDto>>> GetLiveTrailsByLocation([FromQuery] string location)
+        {
+            if (string.IsNullOrWhiteSpace(location))
+            {
+                return BadRequest("Location parameter is required.");
+            }
+
+            var coordinates = await _geocodingService.GetCoordinatesAsync(location);
+
+            if (coordinates == null)
+            {
+                return NotFound($"Could not find coordinates for location: {location}");
+            }
+
+            var trails = await _overpassService.GetHikingTrailsAsync(
+                coordinates.Value.Latitude,
+                coordinates.Value.Longitude,
+                5000);
+
+            return Ok(trails);
         }
 
         // GET: api/trails/{id}/reviews
