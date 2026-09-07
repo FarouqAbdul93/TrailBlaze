@@ -21,12 +21,22 @@
             <p>📝 <strong>Description:</strong> @trail.Description</p>
             <p>⭐ <strong>Rating:</strong> @(trail.AverageRating > 0 ? trail.AverageRating.ToString("0.0") + " / 5" : "No ratings yet")</p>
 
-            <button onclick="@($"showAndInitMap('{mapboxToken}', {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
+            <button onclick="@($"showTrailRoute('{mapboxToken}', {JsonEscape(trail.RouteData)}, {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")" class="btn-map">Show Map</button>
+
             <div id="map" style="width:100%; height:400px; margin-top:20px; display:none;"></div>
 
             <div class="trail-actions" style="margin-top:20px;">
-                <button class="btn-directions" @onclick="GetDirections">Get Directions</button>
-                <button class="btn-start">Start Hike</button>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=@trail.Latitude,@trail.Longitude"
+                   target="_blank"
+                   class="btn-directions"
+                   aria-label="Get directions to trailhead">
+                    Get Directions
+                </a>
+                <button onclick="@($"startHike('{mapboxToken}', {JsonEscape(trail.RouteData)}, {trail.Latitude}, {trail.Longitude}, '{trail.Name}')")"
+                        class="btn-start"
+                        aria-label="Start hike with GPS tracking">
+                    Start Hike
+                </button>
             </div>
 
             @if (trailImages.Any())
@@ -84,17 +94,15 @@
         }
     }
 
-    private async Task GetDirections()
-    {
-        if (trail != null)
-        {
-            await JS.InvokeVoidAsync("showAndInitMap", mapboxToken, trail.Latitude, trail.Longitude, trail.Name);
-        }
-    }
-
     private async Task HandleImageUploaded(string imageUrl)
     {
         await LoadTrailImages();
         StateHasChanged();
+    }
+
+    private string JsonEscape(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return "''";
+        return "'" + value.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\n", "").Replace("\r", "") + "'";
     }
 }

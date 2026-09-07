@@ -48,13 +48,14 @@
 
     private void SearchTrails()
     {
+        var url = "/trails?";
+
         if (!string.IsNullOrEmpty(location))
-        {
-            Navigation.NavigateTo($"/trails?location={location}&difficulty={difficulty}");
-        }
-        else
-        {
-            Navigation.NavigateTo("/trails");
-        }
+            url += $"location={location}&";
+
+        if (!string.IsNullOrEmpty(difficulty))
+            url += $"difficulty={difficulty}";
+
+        Navigation.NavigateTo(url.TrimEnd('&').TrimEnd('?'));
     }
 }

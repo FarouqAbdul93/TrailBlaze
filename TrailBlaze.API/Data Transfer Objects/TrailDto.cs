@@ -11,5 +11,6 @@
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public double AverageRating { get; set; }
+        public string RouteData { get; set; } = string.Empty;
     }
 }

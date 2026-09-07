@@ -55,3 +55,66 @@ window.readFileAsBase64 = function (inputId) {
         reader.readAsDataURL(file);
     });
 };
+
+window.showTrailRoute = function (token, routeData, latitude, longitude, trailName) {
+    if (typeof mapboxgl === 'undefined') {
+        setTimeout(function () {
+            window.showTrailRoute(token, routeData, latitude, longitude, trailName);
+        }, 500);
+        return;
+    }
+
+    var mapDiv = document.getElementById('map');
+    if (mapDiv) {
+        mapDiv.style.display = 'block';
+    }
+
+    mapboxgl.accessToken = token;
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [longitude, latitude],
+        zoom: 11
+    });
+
+    new mapboxgl.Marker()
+        .setLngLat([longitude, latitude])
+        .setPopup(new mapboxgl.Popup().setHTML(`<h3>${trailName}</h3>`))
+        .addTo(map);
+
+    map.addControl(new mapboxgl.NavigationControl());
+
+    if (routeData && routeData.length > 10) {
+        try {
+            const geojson = JSON.parse(routeData);
+            map.on('load', function () {
+                map.addSource('trail-route', {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: geojson
+                    }
+                });
+
+                map.addLayer({
+                    id: 'trail-route',
+                    type: 'line',
+                    source: 'trail-route',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#e85d04',
+                        'line-width': 4,
+                        'line-opacity': 0.8
+                    }
+                });
+            });
+        } catch (e) {
+            console.log('Could not parse route data:', e);
+        }
+    }
+};
+

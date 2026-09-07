@@ -13,14 +13,38 @@ namespace TrailBlaze.API.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Trail>> GetAllTrailsAsync()
+        public async Task<IEnumerable<Trail>> GetAllTrailsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Trails.Include(t => t.Reviews).ToListAsync();
+            return await _context.Trails
+                .Select(t => new Trail
+                {
+                    TrailId = t.TrailId,
+                    Name = t.Name,
+                    Description = t.Description,
+                    Difficulty = t.Difficulty,
+                    DistanceMiles = t.DistanceMiles,
+                    Location = t.Location,
+                    Latitude = t.Latitude,
+                    Longitude = t.Longitude,
+                    RouteData = string.Empty,
+                    Reviews = t.Reviews
+                })
+                .OrderBy(t => t.Name)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalTrailCountAsync()
+        {
+            return await _context.Trails.CountAsync();
         }
 
         public async Task<Trail?> GetTrailByIdAsync(int id)
         {
-            return await _context.Trails.Include(t => t.Reviews).FirstOrDefaultAsync(t => t.TrailId == id);
+            return await _context.Trails
+                .Include(t => t.Reviews)
+                .FirstOrDefaultAsync(t => t.TrailId == id);
         }
 
         public async Task<Trail> CreateTrailAsync(Trail trail)
@@ -34,7 +58,6 @@ namespace TrailBlaze.API.Repositories
         {
             var existing = await _context.Trails.FindAsync(id);
             if (existing == null) return null;
-
             existing.Name = trail.Name;
             existing.Description = trail.Description;
             existing.Difficulty = trail.Difficulty;
@@ -43,7 +66,6 @@ namespace TrailBlaze.API.Repositories
             existing.Latitude = trail.Latitude;
             existing.Longitude = trail.Longitude;
             existing.RouteData = trail.RouteData;
-
             await _context.SaveChangesAsync();
             return existing;
         }
@@ -52,7 +74,6 @@ namespace TrailBlaze.API.Repositories
         {
             var trail = await _context.Trails.FindAsync(id);
             if (trail == null) return false;
-
             _context.Trails.Remove(trail);
             await _context.SaveChangesAsync();
             return true;
@@ -62,9 +83,11 @@ namespace TrailBlaze.API.Repositories
         {
             return await _context.Trails
                 .Include(t => t.Reviews)
-                .Where(t => t.Location.ToLower().Contains(location.ToLower()))
+                .Where(t => t.Location.ToLower().Contains(location.ToLower())
+                         || t.Name.ToLower().Contains(location.ToLower()))
                 .ToListAsync();
         }
+
         public async Task<IEnumerable<Trail>> GetTrailsByDifficultyAsync(Difficulty difficulty)
         {
             return await _context.Trails
