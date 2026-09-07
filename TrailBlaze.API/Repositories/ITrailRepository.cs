@@ -4,7 +4,8 @@ namespace TrailBlaze.API.Repositories
 {
     public interface ITrailRepository
     {
-        Task<IEnumerable<Trail>> GetAllTrailsAsync();
+        Task<IEnumerable<Trail>> GetAllTrailsAsync(int pageNumber, int pageSize);
+        Task<int> GetTotalTrailCountAsync();
         Task<IEnumerable<Trail>> GetTrailsByLocationAsync(string location);
         Task<IEnumerable<Trail>> GetTrailsByDifficultyAsync(Difficulty difficulty);
         Task<Trail?> GetTrailByIdAsync(int id);

@@ -39,32 +39,32 @@ namespace TrailBlaze.Tests
             // Arrange
             var trails = new List<Trail>
             {
-                new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088 },
-                new Trail { TrailId = 2, Name = "Snowdon", Location = "Snowdonia", Difficulty = Difficulty.Moderate, DistanceMiles = 9.0, Latitude = 53.0685, Longitude = -4.0764 }
+                new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088, Reviews = new List<Review>() },
+                new Trail { TrailId = 2, Name = "Snowdon", Location = "Snowdonia", Difficulty = Difficulty.Moderate, DistanceMiles = 9.0, Latitude = 53.0685, Longitude = -4.0764, Reviews = new List<Review>() }
             };
 
-            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync()).ReturnsAsync(trails);
-            _mockReviewRepository.Setup(r => r.GetReviewsByTrailIdAsync(It.IsAny<int>())).ReturnsAsync(new List<Review>());
+            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync(1, 20)).ReturnsAsync(trails);
+            _mockTrailRepository.Setup(r => r.GetTotalTrailCountAsync()).ReturnsAsync(2);
 
             // Act
             var result = await _controller.GetAllTrails();
 
             // Assert
-            Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
-            var okResult = result.Result as OkObjectResult;
-            var returnedTrails = okResult!.Value as List<TrailDto>;
-            Assert.That(returnedTrails, Is.Not.Null);
-            Assert.That(returnedTrails!.Count, Is.EqualTo(2));
+            Assert.That(result, Is.InstanceOf<OkObjectResult>());
+            var okResult = result as OkObjectResult;
+            var value = okResult!.Value;
+            var trailsProp = value!.GetType().GetProperty("trails")!.GetValue(value) as List<TrailDto>;
+            Assert.That(trailsProp, Is.Not.Null);
+            Assert.That(trailsProp!.Count, Is.EqualTo(2));
         }
 
         [Test]
         public async Task GetTrailById_ReturnsOkResult_WhenTrailExists()
         {
             // Arrange
-            var trail = new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088 };
+            var trail = new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088, Reviews = new List<Review>() };
 
             _mockTrailRepository.Setup(r => r.GetTrailByIdAsync(1)).ReturnsAsync(trail);
-            _mockReviewRepository.Setup(r => r.GetReviewsByTrailIdAsync(1)).ReturnsAsync(new List<Review>());
 
             // Act
             var result = await _controller.GetTrailById(1);
@@ -114,7 +114,8 @@ namespace TrailBlaze.Tests
                 DistanceMiles = 3.0,
                 Location = "Peak District",
                 Latitude = 53.3872,
-                Longitude = -1.8726
+                Longitude = -1.8726,
+                Reviews = new List<Review>()
             };
 
             _mockTrailRepository.Setup(r => r.CreateTrailAsync(It.IsAny<Trail>())).ReturnsAsync(createdTrail);
@@ -134,27 +135,28 @@ namespace TrailBlaze.Tests
         public async Task GetAllTrails_ReturnsAverageRating_WhenReviewsExist()
         {
             // Arrange
-            var trails = new List<Trail>
-            {
-                new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088 }
-            };
-
             var reviews = new List<Review>
             {
                 new Review { ReviewId = 1, TrailId = 1, Rating = 4 },
                 new Review { ReviewId = 2, TrailId = 1, Rating = 5 }
             };
 
-            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync()).ReturnsAsync(trails);
-            _mockReviewRepository.Setup(r => r.GetReviewsByTrailIdAsync(1)).ReturnsAsync(reviews);
+            var trails = new List<Trail>
+            {
+                new Trail { TrailId = 1, Name = "Helvellyn Summit", Location = "Lake District", Difficulty = Difficulty.Hard, DistanceMiles = 8.5, Latitude = 54.5274, Longitude = -3.0088, Reviews = reviews }
+            };
+
+            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync(1, 20)).ReturnsAsync(trails);
+            _mockTrailRepository.Setup(r => r.GetTotalTrailCountAsync()).ReturnsAsync(1);
 
             // Act
             var result = await _controller.GetAllTrails();
 
             // Assert
-            var okResult = result.Result as OkObjectResult;
-            var returnedTrails = okResult!.Value as List<TrailDto>;
-            Assert.That(returnedTrails![0].AverageRating, Is.EqualTo(4.5));
+            var okResult = result as OkObjectResult;
+            var value = okResult!.Value;
+            var trailsProp = value!.GetType().GetProperty("trails")!.GetValue(value) as List<TrailDto>;
+            Assert.That(trailsProp![0].AverageRating, Is.EqualTo(4.5));
         }
     }
 }

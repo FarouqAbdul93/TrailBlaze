@@ -11,9 +11,9 @@ namespace TrailBlaze.UI.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<TrailDto>?> GetTrailsAsync()
+        public async Task<PagedTrailsDto?> GetTrailsPagedAsync(int pageNumber = 1, int pageSize = 20)
         {
-            return await _httpClient.GetFromJsonAsync<List<TrailDto>>("api/Trails");
+            return await _httpClient.GetFromJsonAsync<PagedTrailsDto>($"api/Trails?pageNumber={pageNumber}&pageSize={pageSize}");
         }
 
         public async Task<TrailDto?> GetTrailByIdAsync(int id)
@@ -37,6 +37,15 @@ namespace TrailBlaze.UI.Services
         }
     }
 
+    public class PagedTrailsDto
+    {
+        public List<TrailDto> Trails { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public bool HasMore { get; set; }
+    }
+
     public class TrailDto
     {
         public int TrailId { get; set; }
@@ -48,6 +57,7 @@ namespace TrailBlaze.UI.Services
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public double AverageRating { get; set; }
+        public string RouteData { get; set; } = string.Empty;
     }
 
     public class LiveTrailDto

@@ -36,14 +36,11 @@
                     document.getElementById('uploadStatus').innerText = 'Please select a file first';
                     return;
                 }
-
                 const file = input.files[0];
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', uploadPreset);
-
                 document.getElementById('uploadStatus').innerText = 'Uploading...';
-
                 fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                     method: 'POST',
                     body: formData
@@ -52,7 +49,6 @@
                 .then(data => {
                     if (data.secure_url) {
                         const trailId = parseInt(document.getElementById('trailIdInput').value);
-
                         fetch(`${apiBaseUrl}api/Reviews`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -78,6 +74,120 @@
                     document.getElementById('uploadStatus').innerText = '❌ Error: ' + error.message;
                 });
             };
+        };
+
+        window.showTrailRoute = function(token, routeData, latitude, longitude, trailName) {
+            var mapDiv = document.getElementById('map');
+            if (mapDiv) {
+                mapDiv.style.display = 'block';
+            }
+            mapboxgl.accessToken = token;
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/outdoors-v12',
+                center: [longitude, latitude],
+                zoom: 11
+            });
+            new mapboxgl.Marker()
+                .setLngLat([longitude, latitude])
+                .setPopup(new mapboxgl.Popup().setHTML(`<h3>${trailName}</h3>`))
+                .addTo(map);
+            map.addControl(new mapboxgl.NavigationControl());
+            if (routeData && routeData.length > 10) {
+                try {
+                    const geojson = JSON.parse(routeData);
+                    map.on('load', function() {
+                        map.addSource('trail-route', {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                properties: {},
+                                geometry: geojson
+                            }
+                        });
+                        map.addLayer({
+                            id: 'trail-route',
+                            type: 'line',
+                            source: 'trail-route',
+                            layout: {
+                                'line-join': 'round',
+                                'line-cap': 'round'
+                            },
+                            paint: {
+                                'line-color': '#e85d04',
+                                'line-width': 4,
+                                'line-opacity': 0.8
+                            }
+                        });
+                    });
+                } catch(e) {
+                    console.log('Could not parse route data:', e);
+                }
+            }
+        };
+
+        window.startHike = function(token, routeData, latitude, longitude, trailName) {
+            var mapDiv = document.getElementById('map');
+            if (mapDiv) {
+                mapDiv.style.display = 'block';
+            }
+            mapboxgl.accessToken = token;
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/outdoors-v12',
+                center: [longitude, latitude],
+                zoom: 14
+            });
+
+            map.addControl(new mapboxgl.NavigationControl());
+
+            map.addControl(new mapboxgl.GeolocateControl({
+                positionOptions: { enableHighAccuracy: true },
+                trackUserLocation: true,
+                showUserHeading: true
+            }));
+
+            map.on('load', function() {
+                if (routeData && routeData.length > 10) {
+                    try {
+                        const geojson = JSON.parse(routeData);
+                        map.addSource('trail-route', {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                properties: {},
+                                geometry: geojson
+                            }
+                        });
+                        map.addLayer({
+                            id: 'trail-route',
+                            type: 'line',
+                            source: 'trail-route',
+                            layout: {
+                                'line-join': 'round',
+                                'line-cap': 'round'
+                            },
+                            paint: {
+                                'line-color': '#e85d04',
+                                'line-width': 5,
+                                'line-opacity': 0.9
+                            }
+                        });
+                    } catch(e) {
+                        console.log('Could not parse route data:', e);
+                    }
+                }
+
+                new mapboxgl.Marker({ color: '#2c3e2d' })
+                    .setLngLat([longitude, latitude])
+                    .setPopup(new mapboxgl.Popup().setHTML(`<h3>Start: ${trailName}</h3>`))
+                    .addTo(map);
+
+                setTimeout(() => {
+                    const geolocate = document.querySelector('.mapboxgl-ctrl-geolocate');
+                    if (geolocate) geolocate.click();
+                }, 1000);
+            });
         };
     </script>
     <script src="_framework/blazor.web.js"></script>

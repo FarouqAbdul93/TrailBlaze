@@ -26,14 +26,27 @@ namespace TrailBlaze.Tests
                 new Trail { TrailId = 2, Name = "Snowdon", Location = "Snowdonia", Difficulty = Difficulty.Moderate, DistanceMiles = 9.0 }
             };
 
-            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync()).ReturnsAsync(trails);
+            _mockTrailRepository.Setup(r => r.GetAllTrailsAsync(1, 20)).ReturnsAsync(trails);
 
             // Act
-            var result = await _mockTrailRepository.Object.GetAllTrailsAsync();
+            var result = await _mockTrailRepository.Object.GetAllTrailsAsync(1, 20);
 
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public async Task GetTotalTrailCountAsync_ReturnsCorrectCount()
+        {
+            // Arrange
+            _mockTrailRepository.Setup(r => r.GetTotalTrailCountAsync()).ReturnsAsync(694);
+
+            // Act
+            var result = await _mockTrailRepository.Object.GetTotalTrailCountAsync();
+
+            // Assert
+            Assert.That(result, Is.EqualTo(694));
         }
 
         [Test]
