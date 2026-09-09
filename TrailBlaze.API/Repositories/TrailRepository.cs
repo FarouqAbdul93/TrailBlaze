@@ -16,20 +16,6 @@ namespace TrailBlaze.API.Repositories
         public async Task<IEnumerable<Trail>> GetAllTrailsAsync(int pageNumber, int pageSize)
         {
             return await _context.Trails
-                .Select(t => new Trail
-                {
-                    TrailId = t.TrailId,
-                    Name = t.Name,
-                    Description = t.Description,
-                    Difficulty = t.Difficulty,
-                    DistanceMiles = t.DistanceMiles,
-                    Location = t.Location,
-                    Latitude = t.Latitude,
-                    Longitude = t.Longitude,
-                    RouteData = string.Empty,
-                    Reviews = t.Reviews
-                })
-                .OrderBy(t => t.Name)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -44,6 +30,7 @@ namespace TrailBlaze.API.Repositories
         {
             return await _context.Trails
                 .Include(t => t.Reviews)
+                .Include(t => t.TrailRoute)
                 .FirstOrDefaultAsync(t => t.TrailId == id);
         }
 
@@ -65,7 +52,6 @@ namespace TrailBlaze.API.Repositories
             existing.Location = trail.Location;
             existing.Latitude = trail.Latitude;
             existing.Longitude = trail.Longitude;
-            existing.RouteData = trail.RouteData;
             await _context.SaveChangesAsync();
             return existing;
         }

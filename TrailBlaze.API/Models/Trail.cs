@@ -10,8 +10,8 @@
         public string Location { get; set; } = string.Empty;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public string RouteData { get; set; } = string.Empty;
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public TrailRoute? TrailRoute { get; set; }
     }
 
     public enum Difficulty

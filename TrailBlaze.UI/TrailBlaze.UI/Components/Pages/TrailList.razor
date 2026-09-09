@@ -16,11 +16,11 @@
     {
         @if (!string.IsNullOrEmpty(searchLocation))
         {
-            <p>Found <strong>@totalCount</strong> trails matching <strong>@searchLocation</strong></p>
+            <p>Found <strong>@trails.Count</strong> trails matching <strong>@searchLocation</strong></p>
         }
         else
         {
-            <p>Showing <strong>@trails.Count</strong> of <strong>@totalCount</strong> trails</p>
+            <p>Showing <strong>@trails.Count</strong> trails</p>
         }
 
         <div class="trail-grid">
@@ -59,7 +59,6 @@
     private bool isLoading = false;
     private bool hasMore = false;
     private int currentPage = 1;
-    private int totalCount = 0;
     private const int PageSize = 20;
 
     protected override async Task OnInitializedAsync()
@@ -73,7 +72,6 @@
             isLoading = true;
             var results = await TrailService.SearchTrailsAsync(searchLocation);
             trails = results ?? new List<TrailDto>();
-            totalCount = trails.Count;
             hasMore = false;
             isLoading = false;
         }
@@ -82,7 +80,6 @@
             isLoading = true;
             var results = await TrailService.GetTrailsByDifficultyAsync(difficulty!);
             trails = results ?? new List<TrailDto>();
-            totalCount = trails.Count;
             hasMore = false;
             isLoading = false;
         }
@@ -99,7 +96,6 @@
         if (paged != null)
         {
             trails.AddRange(paged.Trails);
-            totalCount = paged.TotalCount;
             hasMore = paged.HasMore;
             currentPage = pageNumber;
         }
