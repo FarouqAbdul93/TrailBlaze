@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TrailBlaze.API.Data_DbContext;
 
@@ -11,9 +12,11 @@ using TrailBlaze.API.Data_DbContext;
 namespace TrailBlaze.API.Migrations
 {
     [DbContext(typeof(TrailBlazeDbContext))]
-    partial class TrailBlazeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260909184318_AddTrailRoutesTable")]
+    partial class AddTrailRoutesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

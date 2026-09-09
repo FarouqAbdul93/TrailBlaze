@@ -28,33 +28,27 @@ namespace TrailBlaze.API.Controllers
         public async Task<ActionResult> GetAllTrails([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
         {
             var trails = await _trailRepository.GetAllTrailsAsync(pageNumber, pageSize);
-            var totalCount = await _trailRepository.GetTotalTrailCountAsync();
+            var trailList = trails.ToList();
 
-            var trailDtos = new List<TrailDto>();
-            foreach (var t in trails)
+            var trailDtos = trailList.Select(t => new TrailDto
             {
-                var averageRating = t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0;
-                trailDtos.Add(new TrailDto
-                {
-                    TrailId = t.TrailId,
-                    Name = t.Name,
-                    Description = t.Description,
-                    Difficulty = t.Difficulty.ToString(),
-                    DistanceMiles = t.DistanceMiles,
-                    Location = t.Location,
-                    Latitude = t.Latitude,
-                    Longitude = t.Longitude,
-                    AverageRating = averageRating
-                });
-            }
+                TrailId = t.TrailId,
+                Name = t.Name,
+                Description = t.Description,
+                Difficulty = t.Difficulty.ToString(),
+                DistanceMiles = t.DistanceMiles,
+                Location = t.Location,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude,
+                AverageRating = t.Reviews != null && t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0
+            }).ToList();
 
             return Ok(new
             {
                 trails = trailDtos,
-                totalCount = totalCount,
                 pageNumber = pageNumber,
                 pageSize = pageSize,
-                hasMore = (pageNumber * pageSize) < totalCount
+                hasMore = trailList.Count == pageSize
             });
         }
 
@@ -67,7 +61,7 @@ namespace TrailBlaze.API.Controllers
             {
                 return NotFound();
             }
-            var averageRating = trail.Reviews.Any() ? trail.Reviews.Average(r => r.Rating) : 0;
+
             var trailDto = new TrailDto
             {
                 TrailId = trail.TrailId,
@@ -78,9 +72,10 @@ namespace TrailBlaze.API.Controllers
                 Location = trail.Location,
                 Latitude = trail.Latitude,
                 Longitude = trail.Longitude,
-                AverageRating = averageRating,
-                RouteData = trail.RouteData
+                AverageRating = trail.Reviews != null && trail.Reviews.Any() ? trail.Reviews.Average(r => r.Rating) : 0,
+                RouteData = trail.TrailRoute?.RouteData ?? string.Empty
             };
+
             return Ok(trailDto);
         }
 
@@ -92,6 +87,7 @@ namespace TrailBlaze.API.Controllers
             {
                 return BadRequest("Invalid difficulty. Must be Easy, Moderate or Hard.");
             }
+
             var trail = new Trail
             {
                 Name = createTrailDto.Name,
@@ -102,7 +98,9 @@ namespace TrailBlaze.API.Controllers
                 Latitude = createTrailDto.Latitude,
                 Longitude = createTrailDto.Longitude
             };
+
             var createdTrail = await _trailRepository.CreateTrailAsync(trail);
+
             var trailDto = new TrailDto
             {
                 TrailId = createdTrail.TrailId,
@@ -115,21 +113,8 @@ namespace TrailBlaze.API.Controllers
                 Longitude = createdTrail.Longitude,
                 AverageRating = 0
             };
-            return CreatedAtAction(nameof(GetTrailById), new { id = createdTrail.TrailId }, trailDto);
-        }
 
-        // PATCH: api/trails/{id}/routedata
-        [HttpPatch("{id}/routedata")]
-        public async Task<ActionResult> UpdateRouteData(int id, [FromBody] UpdateRouteDataDto updateDto)
-        {
-            var trail = await _trailRepository.GetTrailByIdAsync(id);
-            if (trail == null)
-            {
-                return NotFound();
-            }
-            trail.RouteData = updateDto.RouteData;
-            await _trailRepository.UpdateTrailAsync(id, trail);
-            return NoContent();
+            return CreatedAtAction(nameof(GetTrailById), new { id = createdTrail.TrailId }, trailDto);
         }
 
         // GET: api/trails/search?location=
@@ -140,24 +125,22 @@ namespace TrailBlaze.API.Controllers
             {
                 return BadRequest("Location parameter is required.");
             }
+
             var trails = await _trailRepository.GetTrailsByLocationAsync(location);
-            var trailDtos = new List<TrailDto>();
-            foreach (var t in trails)
+
+            var trailDtos = trails.Select(t => new TrailDto
             {
-                var averageRating = t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0;
-                trailDtos.Add(new TrailDto
-                {
-                    TrailId = t.TrailId,
-                    Name = t.Name,
-                    Description = t.Description,
-                    Difficulty = t.Difficulty.ToString(),
-                    DistanceMiles = t.DistanceMiles,
-                    Location = t.Location,
-                    Latitude = t.Latitude,
-                    Longitude = t.Longitude,
-                    AverageRating = averageRating
-                });
-            }
+                TrailId = t.TrailId,
+                Name = t.Name,
+                Description = t.Description,
+                Difficulty = t.Difficulty.ToString(),
+                DistanceMiles = t.DistanceMiles,
+                Location = t.Location,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude,
+                AverageRating = t.Reviews != null && t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0
+            }).ToList();
+
             return Ok(trailDtos);
         }
 
@@ -169,28 +152,27 @@ namespace TrailBlaze.API.Controllers
             {
                 return BadRequest("Difficulty parameter is required.");
             }
+
             if (!Enum.TryParse<Difficulty>(difficulty, true, out var difficultyEnum))
             {
                 return BadRequest("Invalid difficulty. Must be Easy, Moderate or Hard.");
             }
+
             var trails = await _trailRepository.GetTrailsByDifficultyAsync(difficultyEnum);
-            var trailDtos = new List<TrailDto>();
-            foreach (var t in trails)
+
+            var trailDtos = trails.Select(t => new TrailDto
             {
-                var averageRating = t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0;
-                trailDtos.Add(new TrailDto
-                {
-                    TrailId = t.TrailId,
-                    Name = t.Name,
-                    Description = t.Description,
-                    Difficulty = t.Difficulty.ToString(),
-                    DistanceMiles = t.DistanceMiles,
-                    Location = t.Location,
-                    Latitude = t.Latitude,
-                    Longitude = t.Longitude,
-                    AverageRating = averageRating
-                });
-            }
+                TrailId = t.TrailId,
+                Name = t.Name,
+                Description = t.Description,
+                Difficulty = t.Difficulty.ToString(),
+                DistanceMiles = t.DistanceMiles,
+                Location = t.Location,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude,
+                AverageRating = t.Reviews != null && t.Reviews.Any() ? t.Reviews.Average(r => r.Rating) : 0
+            }).ToList();
+
             return Ok(trailDtos);
         }
 
@@ -202,15 +184,18 @@ namespace TrailBlaze.API.Controllers
             {
                 return BadRequest("Location parameter is required.");
             }
+
             var coordinates = await _geocodingService.GetCoordinatesAsync(location);
             if (coordinates == null)
             {
                 return NotFound($"Could not find coordinates for location: {location}");
             }
+
             var trails = await _overpassService.GetHikingTrailsAsync(
                 coordinates.Value.Latitude,
                 coordinates.Value.Longitude,
                 5000);
+
             return Ok(trails);
         }
 
@@ -223,7 +208,9 @@ namespace TrailBlaze.API.Controllers
             {
                 return NotFound("Trail not found.");
             }
+
             var reviews = await _reviewRepository.GetReviewsByTrailIdAsync(id);
+
             var reviewDtos = reviews.Select(r => new ReviewDto
             {
                 ReviewId = r.ReviewId,
@@ -233,6 +220,7 @@ namespace TrailBlaze.API.Controllers
                 ImageUrl = r.ImageUrl,
                 DatePosted = r.DatePosted
             });
+
             return Ok(reviewDtos);
         }
     }

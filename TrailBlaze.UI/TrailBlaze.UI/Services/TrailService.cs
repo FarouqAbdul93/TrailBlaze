@@ -40,7 +40,6 @@ namespace TrailBlaze.UI.Services
     public class PagedTrailsDto
     {
         public List<TrailDto> Trails { get; set; } = new();
-        public int TotalCount { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public bool HasMore { get; set; }
